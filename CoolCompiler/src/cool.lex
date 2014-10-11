@@ -107,7 +107,7 @@ UNDERSCORE="_"
 
 
 
-TYPEID = ":"{WHITESPACE}("Int"|"String"|"Bool"|"Object")
+TYPEID = {WHITESPACE}("Int"|"String"|"Bool"|"Object"|"SELF_TYPE")
 
 OBJECTID = ({CHAR}({CHAR}|{UNDERSCORE}|{DIGIT})*)
 
