@@ -121,4 +121,9 @@ Instructions
 
 Write-up for PA2J
 -----------------
-
+   Implementation is pretty straight forward. Tokens were defined as stated in the Cool manual. 
+   The examples in the instructions were used to add tokens to the tables and submit errors.
+   The reference scanner was used to compare outputs. Most of them were right there's still some errors with the strings.
+   The test cases used where the test.cl that came with the assignment, this one tests identification of basic objects. 
+   test2.cl was created to test encountering and eof mid string and and unmatched comment terminator. 
+   

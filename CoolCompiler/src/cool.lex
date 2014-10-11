@@ -194,6 +194,14 @@ STRING_END= [\"] /* This expression means the character " and if we put it as ""
 <COMMENT> [^\n] {;} /* It means everithing except \n*/
 <COMMENT, YYINITIAL, STRING> {NEWLINE} {curr_lineno++;} /* It's necessary for update current_lineno*/
 
+<YYINITIAL> {COMMENT_END} {
+		String err_msg = new String("Unmatched comment terminator");
+		StringSymbol error = new StringSymbol(err_msg, err_msg.length(), 0);
+		Symbol ret = new Symbol(TokenConstants.ERROR);
+		ret.value = error;
+		return ret;
+}
+
 <YYINITIAL> {STRING_BEGIN} {
 
         yybegin(STRING);
