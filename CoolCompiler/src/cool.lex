@@ -22,6 +22,12 @@ import java_cup.runtime.Symbol;
     int get_curr_lineno() {
 	return curr_lineno;
     }
+    
+    //quick fix to send EOF at the end of the file if it finishes mid comment or mid string
+    private int eof_message = 0;
+    int get_eof_message() {
+    	return eof_message;
+    }
 
     private AbstractSymbol filename;
 
@@ -56,12 +62,28 @@ import java_cup.runtime.Symbol;
     case YYINITIAL:
 	/* nothing special to do in the initial state */
 	break;
-	/* If necessary, add code for other states here, e.g:
-	   case COMMENT:
-	   ...
-	   break;
-	*/
-    }
+	case COMMENT:
+		if(eof_message > 0) {
+			return new Symbol(TokenConstants.EOF);
+		}	
+		String err_msg = new String("EOF in comment");
+		StringSymbol error = new StringSymbol(err_msg, err_msg.length(), 0);
+		Symbol ret = new Symbol(TokenConstants.ERROR);
+		ret.value = error;
+		eof_message++;
+		return ret;
+ 
+    case STRING:
+    if(eof_message > 0) {
+			return new Symbol(TokenConstants.EOF);
+		}	
+		String str_err_msg = new String("EOF in string");
+		StringSymbol str_error = new StringSymbol(str_err_msg, str_err_msg.length(), 0);
+		Symbol str_ret = new Symbol(TokenConstants.ERROR);
+		str_ret.value = str_error;
+		eof_message++;
+		return str_ret;
+	}	
     return new Symbol(TokenConstants.EOF);
 %eofval}
 
