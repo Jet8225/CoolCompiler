@@ -11,7 +11,7 @@ import java_cup.runtime.Symbol;
  *  lexer actions should go here.  Don't remove or modify anything that
  *  was there initially.  */
 
-%{
+%{ 
     // Max size of string constants
     static int MAX_STR_CONST = 1025;
 
@@ -109,6 +109,7 @@ UPPERCHAR = [A-Z]
 CHAR = ({LOWERCHAR}|{UPPERCHAR})
 DIGIT = [0-9]
 
+
 PLUS = "+"
 DIV = "/"
 MINUS = "-"
@@ -156,6 +157,8 @@ ISVOID=[Ii][Ss][Vv][Oo][Ii][Dd]
 TRUE=[t][Rr][Uu][Ee]
 FALSE=[f][Aa][Ll][Ss][Ee]
 BOOL_CONST=({TRUE}|{FALSE})
+
+UNEXPECTED_CHAR=[^]
 
 %state COMMENT
 
@@ -209,12 +212,11 @@ STRING_END= [\"] /* This expression means the character " and if we put it as ""
 
 <STRING> {STRING_CONST} {
 
-        AbstractSymbol s1 = AbstractTable.stringtable.addString(yytext());
+        AbstractSymbol s1 = AbstractTable.stringtable.addString(yytext().substring(0,yytext().length()-1));
         Symbol s2 = new Symbol(TokenConstants.STR_CONST);
         s2.value = s1;
         yybegin(YYINITIAL);
-        return s2;
-        
+        return s2;       
 }
 
 <STRING> {STRING_END} {;}
@@ -284,6 +286,12 @@ STRING_END= [\"] /* This expression means the character " and if we put it as ""
 <YYINITIAL>{AT}			{ return new Symbol(TokenConstants.AT); }
 <YYINITIAL>{LBRACE}		{ return new Symbol(TokenConstants.LBRACE); }
 <YYINITIAL>{RBRACE}		{ return new Symbol(TokenConstants.RBRACE); }
+
+<YYINITIAL>{UNEXPECTED_CHAR}		{ 		String err_msg = new String("Unexpected character: "+yytext());
+											StringSymbol error = new StringSymbol(err_msg, err_msg.length(), 0);
+											Symbol ret = new Symbol(TokenConstants.ERROR);
+											ret.value = error;
+											return ret;}
 
 
 
