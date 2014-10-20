@@ -79,6 +79,16 @@ nonterminal Expression expr;
 
 /* Precedence declarations go here. */
 
+precedence left ASSIGN;
+precedence left NOT;
+precedence left LE, LT, EQ;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV;
+precedence left ISVOID;
+precedence left NEG;
+precedence left AT;
+precedence left DOT;
+
 program	
 	::= class_list:cl
 	    {: RESULT = new program(curr_lineno(), cl); :}
