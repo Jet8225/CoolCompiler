@@ -263,7 +263,29 @@ expr
     |   NEW TYPEID:t
         {: RESULT = new new_(curr_lineno(),t); :}
         
-        ;
+
+        
+    /*expr + expr*/
+    |   expr:e_1 PLUS expr:e_2
+        {:  RESULT = new plus(curr_lineno(), e_1, e_2);  :}
+	
+	/*expr - expr*/
+	|   expr:e_1 MINUS expr:e_2
+		{:	RESULT = new sub(curr_lineno(), e_1, e_2);  :}
+		
+	/*expr * expr*/
+	|	expr:e_1 MULT expr:e_2
+		{: RESULT = new mul(curr_lineno(), e_1, e_2);  :}
+		
+	/* expr / expr */
+	|	expr:e_1 DIV expr:e_2
+		{: RESULT = new divide(curr_lineno(), e_1, e_2);  :}
+		
+	/* ~expr */
+	|	NEG expr:e
+		{: RESULT = new neg(curr_lineno(), e);   :}
+		
+		;
         
 
  
