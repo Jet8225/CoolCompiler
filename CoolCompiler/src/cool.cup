@@ -262,8 +262,10 @@ expr
 	/* new TYPE */
     |   NEW TYPEID:t
         {: RESULT = new new_(curr_lineno(),t); :}
-        
-
+       
+    /* isvoid expr */
+    |	ISVOID expr:e
+    	{: RESULT = new isvoid(curr_lineno(), e); :}
         
     /*expr + expr*/
     |   expr:e_1 PLUS expr:e_2
@@ -290,7 +292,7 @@ expr
 		{: RESULT = new lt(curr_lineno(), e_1, e_2);  :}
 		
 	/* expr <= expr */
-	|	expr:e_1 LT EQ expr:e_2
+	|	expr:e_1 LE expr:e_2
 		{: RESULT = new leq(curr_lineno(), e_1, e_2); :}
 		
 	/* expr = expr */
@@ -301,6 +303,26 @@ expr
 	|	NOT expr:e 
 		{: RESULT = new comp(curr_lineno(), e); :}
 			
+	/* (expr) */
+	| 	LPAREN expr_list:el RPAREN
+		{: RESULT = new block(curr_lineno(), el); :}
+		
+	/* ID */
+	| 	OBJECTID:o
+		{: RESULT = new object(curr_lineno(), o); :}
+		
+	/* integer */
+	|	INT_CONST:i
+		{: RESULT = new int_const(curr_lineno(), i); :}
+	
+	/* string */
+	|	STR_CONST:s
+		{: RESULT = new string_const(curr_lineno(), s); :}
+	
+	/* true|false */
+	|	BOOL_CONST:b
+		{: RESULT = new bool_const(curr_lineno(), b); :}
+		
 		
 	
 		;
