@@ -117,6 +117,10 @@ class
 				   f, curr_filename()); :}
 	| CLASS TYPEID:n INHERITS TYPEID:p LBRACE dummy_feature_list:f RBRACE SEMI
 	    {: RESULT = new class_(curr_lineno(), n, p, f, curr_filename()); :}
+	    
+	| CLASS error SEMI 
+		{:  :}
+		
 	;
 
 /* Feature list may be empty. */
@@ -156,6 +160,10 @@ feature
 	/* ID : TYPE [ <- expr ]; */
 	| attr: a
 	    {: RESULT = (new Features(curr_lineno())).appendElement(a);:}
+	
+	/* Error in feature */
+	| OBJECTID:o error SEMI
+		{: ; :}
 	;
 	
 /* Formal list may be empty*/ 
@@ -188,6 +196,7 @@ expr_list
     /* several expressions */
     |   expr_list:el expr:e SEMI
         {: RESULT = el.appendElement(e); :}
+        
     ;
     
 /* El interior de un let. Necesario para recursividad dentro de un let. */
@@ -203,7 +212,12 @@ let_
         
   	| OBJECTID:o COLON TYPEID:t IN expr:e_1
          {: RESULT = new let(curr_lineno(),o,t,new no_expr(curr_lineno()),e_1); :}
-        
+         
+    | OBJECTID:o error let_:l
+    	{: ;:}
+    
+    | OBJECTID:o error expr:e
+        {: ; :}
     ;
     
 /* Necesario para la expresion case, ya que puede tener uno o varios casos */
@@ -236,8 +250,9 @@ expr
     /* expr.ID(expr)    
 	|	expr:e DOT OBJECTID:o LPAREN arguments:args RPAREN
         {: RESULT = new dispatch(curr_lineno(),e,o,args);  :}
-    /* ID.(expr)  */
-	/* NO SE COMO HACERLO */
+    /* ID(expr,*)  */
+	|	OBJECTID:o LPAREN arguments:args RPAREN
+		{: RESULT = new dispatch(curr_lineno(),new no_expr(curr_lineno()), o, args); :}
 	
 	/* if expr then expr else expr fi */
     |   IF expr:e_1 THEN expr:e_2 ELSE expr:e_3 FI
@@ -250,10 +265,16 @@ expr
     /* expr;+. Es importante tener en cuenta que cada expresion debe seguir de un ;, al estar entre {}. Ver como se ha definido expr_list*/
 	|   LBRACE expr_list:el RBRACE
         {: RESULT = new block(curr_lineno(),el); :} 
+    
+    /* error in blocks */
+    |	LBRACE error RBRACE
+    	{: :}
         
     /* let [[ID : TYPE [ <- expr ]]],+ in expr */  
 	| LET let_:l
         {: RESULT =  l;:}
+    
+    
         
     /* case expr of [[ID : TYPE => expr;]]+ esac */
 	| CASE expr:e OF case_options:co ESAC
