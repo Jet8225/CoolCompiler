@@ -76,7 +76,9 @@ nonterminal Formals dummy_formal_list;
 nonterminal Formals formal_list;
 nonterminal formal formal;
 nonterminal Expression expr;
+nonterminal Expressions expr_list;
 nonterminal Expressions arguments;
+nonterminal let let_;
 
 
 /* Precedence declarations go here. */
@@ -174,7 +176,37 @@ formal
         {: RESULT = new formal(curr_lineno(),o,t); :}
     ;
 
-/* List of expressions. Bellow each expression, there is the expression according Figure 1 of Aid*/ 
+/* List of expressions */
+expr_list
+
+	/* single expression */
+    ::= expr:e SEMI
+        {: RESULT = (new Expressions(curr_lineno())).appendElement(e); :}
+        
+    /* several expressions */
+    |   expr_list:el expr:e SEMI
+        {: RESULT = el.appendElement(e); :}
+    ;
+    
+/* El interior de un let. Necesario para recursividad dentro de un let. */
+let_ 
+    ::=  OBJECTID:o COLON TYPEID:t ASSIGN expr:e_1 COMMA  let_:l
+        {: RESULT = new let(curr_lineno(),o,t,e_1,l); :}
+        
+	| OBJECTID:o COLON TYPEID:t ASSIGN expr:e_1 IN expr:e_2
+        {: RESULT = new let(curr_lineno(),o,t,e_1,e_2); :}
+        
+	| OBJECTID:o COLON TYPEID:t COMMA let_:l
+         {: RESULT = new let(curr_lineno(),o,t,new no_expr(curr_lineno()),l); :}
+        
+  	| OBJECTID:o COLON TYPEID:t IN expr:e_1
+         {: RESULT = new let(curr_lineno(),o,t,new no_expr(curr_lineno()),e_1); :}
+        
+    ;
+
+
+
+/* Expression. Bellow each expression, there is the expression according Figure 1 of Aid*/ 
 expr
 
 	/* ID <- expr */
@@ -198,7 +230,15 @@ expr
     /* while expr loop expr pool */
     |   WHILE expr:e_1 LOOP expr:e_2 POOL
         {:  RESULT = new loop(curr_lineno(), e_1, e_2);  :}
-	
+        
+    /* expr;+. Es importante tener en cuenta que cada expresion debe seguir de un ;, al estar entre {}. Ver como se ha definido expr_list*/
+	|   LBRACE expr_list:el RBRACE
+        {: RESULT = new block(curr_lineno(),el); :} 
+        
+    /* let [[ID : TYPE [ <- expr ]]],+ in expr */  
+	| LET let_:l
+        {: RESULT =  l;:}
+        
         ;
         
 
