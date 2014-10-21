@@ -285,6 +285,24 @@ expr
 	|	NEG expr:e
 		{: RESULT = new neg(curr_lineno(), e);   :}
 		
+	/* expr < expr */
+	|	expr:e_1 LT expr:e_2
+		{: RESULT = new lt(curr_lineno(), e_1, e_2);  :}
+		
+	/* expr <= expr */
+	|	expr:e_1 LT EQ expr:e_2
+		{: RESULT = new leq(curr_lineno(), e_1, e_2); :}
+		
+	/* expr = expr */
+	| 	expr:e_1 EQ expr:e_2
+		{: RESULT = new eq(curr_lineno(), e_1, e_2); :}
+		
+	/* not expr */
+	|	NOT expr:e 
+		{: RESULT = new comp(curr_lineno(), e); :}
+			
+		
+	
 		;
         
 
