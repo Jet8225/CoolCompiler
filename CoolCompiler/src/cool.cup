@@ -73,8 +73,10 @@ nonterminal method method;
 nonterminal attr attr;
 nonterminal Features feature;
 nonterminal Formals dummy_formal_list;
+nonterminal Formals formal_list;
 nonterminal formal formal;
 nonterminal Expression expr;
+nonterminal Expressions arguments;
 
 
 /* Precedence declarations go here. */
@@ -160,14 +162,37 @@ feature
 	| formal:f
         {: RESULT = (new Formals(curr_lineno())).appendElement(f); :}
     /* several formals */
-    |   dummy_formal_list:fol COMMA formal:f
+    |   formal_list:fol COMMA formal:f
         {: RESULT = fol.appendElement(f); :}
     ;
     
 /* Formal */
 formal
+
+	/*  ID : TYPE */ 
     ::= OBJECTID:o COLON TYPEID:t
         {: RESULT = new formal(curr_lineno(),o,t); :}
     ;
-    
+
+/* List of expressions. Bellow each expression, there is the expression according Figure 1 of Aid*/ 
+expr
+
+	/* ID <- expr */
+    ::= OBJECTID:o ASSIGN expr:e
+        {: RESULT = new assign(curr_lineno(),o,e); :}
+     
+    /* expr@TYPE.ID(expr) */
+    |   expr:e AT TYPEID:t DOT OBJECTID:o LPAREN arguments:args RPAREN 
+        {: RESULT = new static_dispatch(curr_lineno(), e,t, o, args); :}
+        
+    /* expr.ID(expr)    
+	|	expr:e DOT OBJECTID:o LPAREN arguments:args RPAREN
+        {: RESULT = new dispatch(curr_lineno(),e,o,args);  :}
+    /* ID.(expr)  */
+	/* NO SE COMO HACERLO */
+	
+	
+        ;
+        
+
  
