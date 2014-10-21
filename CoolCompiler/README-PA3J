@@ -135,3 +135,6 @@ Instructions
 
 Write-up for PA3J
 -----------------
+The code defines the rules as they are stated in the cool manual. 
+Added definitions were made to simplify some and represent some features that the manual expressed as regular expressions. 
+Test couldn't be done. Errors with the scanner that coudln't be solved. 
