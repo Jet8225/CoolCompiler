@@ -191,6 +191,13 @@ expr
     /* ID.(expr)  */
 	/* NO SE COMO HACERLO */
 	
+	/* if expr then expr else expr fi */
+    |   IF expr:e_1 THEN expr:e_2 ELSE expr:e_3 FI
+        {:  RESULT = new cond(curr_lineno(), e_1, e_2, e_3);  :} 
+        
+    /* while expr loop expr pool */
+    |   WHILE expr:e_1 LOOP expr:e_2 POOL
+        {:  RESULT = new loop(curr_lineno(), e_1, e_2);  :}
 	
         ;
         
