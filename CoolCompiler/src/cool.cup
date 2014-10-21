@@ -79,6 +79,8 @@ nonterminal Expression expr;
 nonterminal Expressions expr_list;
 nonterminal Expressions arguments;
 nonterminal let let_;
+nonterminal Cases case_options;
+nonterminal branch case_expr;
 
 
 /* Precedence declarations go here. */
@@ -203,7 +205,21 @@ let_
          {: RESULT = new let(curr_lineno(),o,t,new no_expr(curr_lineno()),e_1); :}
         
     ;
-
+    
+/* Necesario para la expresion case, ya que puede tener uno o varios casos */
+case_options
+	/* single case */
+    ::= case_expr:c SEMI
+        {: RESULT = (new Cases(curr_lineno())).appendElement(c); :}
+    |   case_options:co case_expr:c SEMI
+    /* several cases */
+        {: RESULT = co.appendElement(c); :}
+    ;
+        
+case_expr
+    ::= OBJECTID:o COLON TYPEID:t DARROW expr:e
+        {: RESULT = new branch(curr_lineno(),o,t,e); :}
+    ;
 
 
 /* Expression. Bellow each expression, there is the expression according Figure 1 of Aid*/ 
@@ -238,6 +254,14 @@ expr
     /* let [[ID : TYPE [ <- expr ]]],+ in expr */  
 	| LET let_:l
         {: RESULT =  l;:}
+        
+    /* case expr of [[ID : TYPE => expr;]]+ esac */
+	| CASE expr:e OF case_options:co ESAC
+        {:  RESULT = new typcase(curr_lineno(),e,co); :}
+        
+	/* new TYPE */
+    |   NEW TYPEID:t
+        {: RESULT = new new_(curr_lineno(),t); :}
         
         ;
         
